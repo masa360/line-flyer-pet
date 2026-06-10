@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LINE予約システム｜Web版チラシ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+      background: #e8f3ea;
+      color: #1a1a1a;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* ===== スライダー全体 ===== */
+    .slider-viewport {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 0 70px;
+      overflow: hidden;
+    }
+
+    /* スケール調整のための外枠（A4を画面幅に収める） */
+    .stage {
+      position: relative;
+      width: 794px;
+      height: 1123px;
+      transform-origin: top center;
+      /* JSで transform: scale() を設定 */
+    }
+
+    .track {
+      display: flex;
+      width: 1588px; /* 794 * 2 */
+      height: 1123px;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 各A4ページ */
+    .page {
+      width: 794px;
+      height: 1123px;
+      background: #fff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+      flex-shrink: 0;
+    }
+
+    /* ===== ナビ（矢印・ドット）===== */
+    .nav-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #00b900;
+      color: #fff;
+      border: none;
+      font-size: 22px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.9;
+      transition: opacity 0.2s, background 0.2s;
+    }
+    .nav-arrow:hover { opacity: 1; }
+    .nav-arrow:disabled { opacity: 0.25; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    .dots {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 50;
+      background: rgba(255,255,255,0.9);
+      padding: 9px 16px;
+      border-radius: 30px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+      align-items: center;
+    }
+    .dot {
+      width: 11px; height: 11px; border-radius: 50%;
+      background: #c5dccb; border: none; cursor: pointer; padding: 0;
+      transition: background 0.2s, width 0.2s;
+    }
+    .dot.active { background: #00b900; width: 26px; border-radius: 6px; }
+    .dot-label { font-size: 11px; color: #555; font-weight: 700; margin-left: 4px; }
+
+    /* スワイプヒント（初回のみ） */
+    .swipe-hint {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      font-size: 12px;
+      padding: 7px 16px;
+      border-radius: 20px;
+      z-index: 60;
+      animation: hintFade 3.5s ease forwards;
+      pointer-events: none;
+    }
+    @keyframes hintFade {
+      0%, 70% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    /* =========================================================
+       表面（slide-front）スコープ
+       ========================================================= */
+    .slide-front .hero {
+      background: linear-gradient(160deg, #00b900 0%, #00c853 60%, #00e676 100%);
+      flex: 0 0 56%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 60px 24px; position: relative; text-align: center;
+    }
+    .slide-front .hero-label {
+      display: inline-block; background: rgba(255,255,255,0.22); color: #fff;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+      padding: 4px 14px; border-radius: 20px; margin-bottom: 22px;
+    }
+    .slide-front .hero h1 {
+      color: #fff; font-size: 46px; font-weight: 900;
+      line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .slide-front .hero h1 em {
+      font-style: normal; background: rgba(255,255,255,0.2);
+      border-radius: 6px; padding: 0 6px;
+    }
+    .slide-front .hero-sub {
+      color: rgba(255,255,255,0.95); font-size: 16px; font-weight: 600;
+      line-height: 1.7; margin-bottom: 20px;
+    }
+    .slide-front .price-hero { display: flex; align-items: center; gap: 20px; }
+    .slide-front .price-box {
+      background: #fff; border-radius: 16px; padding: 16px 28px;
+      text-align: center; box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+    }
+    .slide-front .price-box .pb-label { font-size: 11px; color: #888; font-weight: 600; margin-bottom: 2px; }
+    .slide-front .price-box .pb-num   { font-size: 44px; font-weight: 900; color: #00b900; line-height: 1; }
+    .slide-front .price-box .pb-unit  { font-size: 13px; color: #555; margin-top: 2px; }
+    .slide-front .vs-arrow { color: rgba(255,255,255,0.7); font-size: 28px; font-weight: 900; }
+    .slide-front .price-box-other {
+      background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 16px; padding: 16px 28px; text-align: center;
+    }
+    .slide-front .price-box-other .pb-label { font-size: 11px; color: rgba(255,255,255,0.75); font-weight: 600; margin-bottom: 2px; }
+    .slide-front .price-box-other .pb-num   { font-size: 44px; font-weight: 900; color: #fff; line-height: 1; text-decoration: line-through; opacity: 0.7; }
+    .slide-front .price-box-other .pb-unit  { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+    .slide-front .ratio-badge {
+      position: absolute; top: 20px; right: 32px; background: #fff;
+      border-radius: 50%; width: 92px; height: 92px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15); text-align: center;
+    }
+    .slide-front .ratio-badge .r-num  { font-size: 22px; font-weight: 900; color: #00b900; line-height: 1.1; }
+    .slide-front .ratio-badge .r-unit { font-size: 9px; color: #555; font-weight: 700; }
+    .slide-front .hero-cta {
+      display: flex; align-items: center; gap: 16px; margin-top: 22px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .slide-front .hero-cta-qr { text-align: center; }
+    .slide-front .hero-cta-qr img {
+      width: 64px; height: 64px; border-radius: 6px; background: #fff;
+      padding: 4px; display: block;
+    }
+    .slide-front .hero-cta-qr span {
+      font-size: 8px; color: rgba(255,255,255,0.85); font-weight: 700;
+      margin-top: 2px; display: block;
+    }
+    .slide-front .hero-cta-btn {
+      display: inline-block; background: #fff; color: #00b900;
+      font-size: 13px; font-weight: 800; padding: 11px 22px;
+      border-radius: 30px; text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); white-space: nowrap;
+    }
+    .slide-front .subsidy-bubble {
+      position: relative; display: inline-block; background: #fff3cd;
+      color: #8a6d00; font-size: 15px; font-weight: 900;
+      padding: 9px 20px; border-radius: 24px; margin-top: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+    .slide-front .subsidy-bubble::after {
+      content: ''; position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+      border-left: 9px solid transparent; border-right: 9px solid transparent;
+      border-bottom: 9px solid #fff3cd;
+    }
+    .slide-front .hero-cta-note {
+      font-size: 15px; color: #fff; font-weight: 600; margin-top: 8px;
+      line-height: 1.7; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .slide-front .wave { flex-shrink: 0; display: block; margin-top: -2px; }
+    .slide-front .bottom { flex: 1; display: grid; grid-template-columns: 220px 1fr; gap: 0; }
+    .slide-front .block-left {
+      padding: 20px 20px 20px 24px; border-right: 2px solid #e8e8e8;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .slide-front .block-left-title {
+      font-size: 15px; font-weight: 900; line-height: 1.4; color: #1a1a1a; margin-bottom: 14px;
+    }
+    .slide-front .block-left-title span { color: #00b900; }
+    .slide-front .ng-list { list-style: none; display: grid; gap: 7px; margin-bottom: 16px; }
+    .slide-front .ng-list li { font-size: 12px; color: #c0392b; display: flex; gap: 7px; align-items: center; text-decoration: line-through; text-decoration-color: #e57373; }
+    .slide-front .ng-list li::before { content: '✗'; color: #e53935; font-weight: 700; font-size: 13px; }
+    .slide-front .ok-list { list-style: none; display: grid; gap: 8px; }
+    .slide-front .ok-list li { font-size: 14px; font-weight: 800; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+    .slide-front .ok-list li::before { content: '✓'; color: #00b900; font-weight: 900; font-size: 15px; }
+    .slide-front .block-accent-left {
+      margin-top: 14px; background: #f0fff4; border-left: 3px solid #00b900;
+      border-radius: 0 6px 6px 0; padding: 10px 12px; font-size: 12.5px;
+      color: #1a6b3a; font-weight: 700; line-height: 1.65;
+    }
+    .slide-front .block-right { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .slide-front .feature-col {
+      padding: 18px 16px 16px; border-right: 1px solid #f0f0f0;
+      display: flex; flex-direction: column; position: relative;
+    }
+    .slide-front .feature-col:last-child { border-right: none; }
+    .slide-front .feature-col:first-child::before {
+      content: '→'; position: absolute; left: -18px; top: 50%; transform: translateY(-50%);
+      font-size: 20px; font-weight: 900; color: #00b900;
+    }
+    .slide-front .feature-cat {
+      font-size: 13px; font-weight: 900; color: #00b900; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 5px;
+      border-bottom: 1px solid #d0eed8; padding-bottom: 7px;
+    }
+    .slide-front .feature-list { list-style: none; display: grid; gap: 7px; flex: 1; }
+    .slide-front .feature-list li {
+      font-size: 12px; color: #333; line-height: 1.5;
+      display: flex; gap: 6px; align-items: flex-start;
+    }
+    .slide-front .feature-list li::before { content: '›'; color: #00b900; font-weight: 900; font-size: 14px; flex-shrink: 0; }
+    .slide-front .feature-list li.dim { color: #aaa; font-size: 11px; }
+    .slide-front .feature-list li.dim::before { color: #ccc; }
+    .slide-front .feature-accent {
+      margin-top: 10px; background: #f0fff4; border-left: 3px solid #00b900;
+      border-radius: 0 6px 6px 0; padding: 9px 11px; font-size: 13px;
+      color: #1a6b3a; font-weight: 900; line-height: 1.6;
+    }
+    .slide-front .feature-miss {
+      margin-top: auto; background: #fff5f5; border-left: 3px solid #ff8a80;
+      border-radius: 0 6px 6px 0; padding: 8px 10px; font-size: 10.5px;
+      color: #b03a3a; font-weight: 700; line-height: 1.55;
+    }
+    .slide-front .feature-miss .miss-label {
+      display: block; font-size: 9px; letter-spacing: 0.08em; color: #e57373; margin-bottom: 3px;
+    }
+
+    /* =========================================================
+       裏面（slide-back）スコープ
+       ========================================================= */
+    .slide-back .header {
+      background: linear-gradient(135deg, #00b900 0%, #00e676 100%);
+      padding: 18px 36px 16px; display: flex; align-items: center;
+      justify-content: space-between; flex-shrink: 0;
+    }
+    .slide-back .header-label {
+      display: inline-block; background: rgba(255,255,255,0.25); color: #fff;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 6px;
+    }
+    .slide-back .header h1 { color: #fff; font-size: 17px; font-weight: 900; line-height: 1.45; }
+    .slide-back .header h1 span {
+      display: block; font-size: 11px; font-weight: 500; opacity: 0.88; margin-top: 3px;
+    }
+    .slide-back .header-badge {
+      background: #fff; border-radius: 50%; width: 72px; height: 72px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15); flex-shrink: 0;
+    }
+    .slide-back .header-badge .badge-sub   { font-size: 8px; color: #888; font-weight: 600; }
+    .slide-back .header-badge .badge-price { font-size: 16px; font-weight: 900; color: #00b900; line-height: 1; }
+    .slide-back .header-badge .badge-unit  { font-size: 8px; color: #555; }
+    .slide-back .body { flex: 1; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+    .slide-back .col-left { display: flex; flex-direction: column; border-right: 1px solid #efefef; overflow: hidden; }
+    .slide-back .col-right { display: flex; flex-direction: column; overflow: hidden; }
+    .slide-back .sec { padding: 14px 18px 12px; flex-shrink: 0; }
+    .slide-back .sec-title {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.12em; color: #00b900;
+      margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .slide-back .sec-title::after { content: ''; flex: 1; height: 1px; background: #d0eed8; }
+    .slide-back .needs { display: grid; gap: 6px; }
+    .slide-back .need-card {
+      background: #fff8f8; border-left: 3px solid #ff6b6b; border-radius: 0 6px 6px 0;
+      padding: 9px 10px; font-size: 11.5px; line-height: 1.55; display: flex; gap: 7px;
+    }
+    .slide-back .baa-wrap { display: grid; grid-template-columns: 1fr 20px 1fr; align-items: center; }
+    .slide-back .baa-col { border-radius: 7px; padding: 9px 9px; }
+    .slide-back .baa-col.before { background: #f5f5f5; border: 1px solid #ddd; }
+    .slide-back .baa-col.after  { background: #e8f9ee; border: 1px solid #b2dfca; }
+    .slide-back .baa-label {
+      font-size: 9px; font-weight: 800; letter-spacing: 0.1em;
+      padding: 2px 7px; border-radius: 20px; display: inline-block; margin-bottom: 6px;
+    }
+    .slide-back .before .baa-label { background: #e0e0e0; color: #777; }
+    .slide-back .after  .baa-label { background: #00b900; color: #fff; }
+    .slide-back .baa-list { list-style: none; }
+    .slide-back .baa-list li {
+      font-size: 10px; line-height: 1.55; padding: 2px 0;
+      border-bottom: 1px dashed #ddd; display: flex; gap: 4px;
+    }
+    .slide-back .baa-list li:last-child { border-bottom: none; }
+    .slide-back .baa-arrow { text-align: center; font-size: 18px; color: #00b900; font-weight: 900; }
+    .slide-back .screenshots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .slide-back .screenshot-item img {
+      width: 100%; border-radius: 7px; border: 1px solid #e0e0e0;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1); display: block;
+    }
+    .slide-back .screenshot-item p { font-size: 9px; color: #999; text-align: center; margin-top: 3px; }
+    .slide-back .cal-stack { flex: 1; display: flex; flex-direction: column; gap: 7px; overflow: hidden; }
+    .slide-back .cal-item { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .slide-back .cal-item img {
+      flex: 1; width: 100%; object-fit: cover; object-position: top left;
+      border-radius: 7px; border: 1px solid #e0e0e0; box-shadow: 0 1px 5px rgba(0,0,0,0.1); min-height: 0;
+    }
+    .slide-back .cal-item p { font-size: 9px; color: #999; text-align: center; margin-top: 3px; flex-shrink: 0; }
+    .slide-back .industries { display: flex; flex-wrap: wrap; gap: 5px; }
+    .slide-back .ind-tag {
+      background: #f0fff4; border: 1px solid #b2dfca; border-radius: 20px;
+      padding: 3px 9px; font-size: 10px; color: #1a6b3a; font-weight: 600;
+    }
+    .slide-back .price-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .slide-back .price-card { border-radius: 9px; padding: 12px 11px; position: relative; }
+    .slide-back .price-card.basic { background: linear-gradient(135deg, #e8f9ee, #f0fff4); border: 2px solid #00b900; }
+    .slide-back .price-card.pro { background: #f5f5f5; border: 1px solid #ddd; }
+    .slide-back .rec-badge {
+      position: absolute; top: -1px; right: 10px; background: #00b900; color: #fff;
+      font-size: 8px; font-weight: 700; padding: 2px 7px; border-radius: 0 0 5px 5px;
+    }
+    .slide-back .plan-name  { font-size: 12px; font-weight: 900; margin-bottom: 2px; }
+    .slide-back .plan-catch { font-size: 9px; color: #00b900; font-weight: 700; margin-bottom: 5px; line-height: 1.4; }
+    .slide-back .plan-price-row { display: flex; align-items: baseline; gap: 2px; margin-bottom: 2px; }
+    .slide-back .plan-price { font-size: 22px; font-weight: 900; color: #00b900; line-height: 1; }
+    .slide-back .plan-unit  { font-size: 9px; color: #555; }
+    .slide-back .plan-initial { font-size: 9px; color: #888; margin-bottom: 6px; }
+    .slide-back .plan-features { list-style: none; }
+    .slide-back .plan-features li { font-size: 9.5px; color: #444; padding: 2px 0; display: flex; gap: 4px; }
+    .slide-back .plan-features li::before { content: '✓'; color: #00b900; font-weight: 700; }
+
+    @media print {
+      body { background: #fff; }
+      .nav-arrow, .dots, .swipe-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="slider-viewport">
+  <div class="stage" id="stage">
+    <div class="track" id="track">
+
+      <!-- ============ 表面 ============ -->
+      <div class="page slide-front">
+        <!-- ヒーロー -->
+        <div class="hero">
+          <div class="ratio-badge">
+            <span class="r-unit">月額</span>
+            <span class="r-num">5,000円</span>
+            <span class="r-unit">（税別）</span>
+          </div>
+          <div class="hero-label">LINE × リピーター × 売上アップ</div>
+          <h1>リピーターこそ、<em>最強の売上。</em><br>LINEが自動で連れ戻す。</h1>
+          <p class="hero-sub">
+            新規集客は、常連を保つ<strong style="background:rgba(255,255,255,0.2);border-radius:5px;padding:0 6px;">5倍</strong>のコスト。<br>
+            「また来たい」をLINEが自動でつくり、売上を伸ばします。<br>
+            <strong>必要な機能だけに絞って、あとは賢く放置。</strong>
+          </p>
+          <div class="price-hero">
+            <div class="price-box-other">
+              <div class="pb-label">大手ツール 月額</div>
+              <div class="pb-num">41,780</div>
+              <div class="pb-unit">円〜（Lステップ）</div>
+            </div>
+            <div class="vs-arrow">→</div>
+            <div class="price-box">
+              <div class="pb-label">このシステム 月額</div>
+              <div class="pb-num">5,000</div>
+              <div class="pb-unit">円（税別）</div>
+            </div>
+          </div>
+          <div class="hero-cta">
+            <div class="hero-cta-qr">
+              <img src="images/M_gainfriends_2dbarcodes_GW.png" alt="LINE友だち追加QR">
+              <span>QRで友だち追加</span>
+            </div>
+            <a href="https://lin.ee/OIsoJvM" class="hero-cta-btn">📱 lineで完結！デモはこちら</a>
+          </div>
+          <div class="subsidy-bubble">🏛️ 補助金無料相談もできます</div>
+          <p class="hero-cta-note">
+            友だち追加後、説明資料・デモ体験・無料相談メニューが見れます。<br>
+            <span style="background:rgba(255,255,255,0.95); color:#1a8a3a; font-weight:800; padding:2px 8px; border-radius:5px;">こちらから営業メールを送ることはないのでご安心ください。</span>
+          </p>
+        </div>
+        <!-- ウェーブ -->
+        <svg class="wave" viewBox="0 0 794 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="height:32px; width:100%; display:block; background:#fff; margin-top:-1px;">
+          <path d="M0,0 C200,48 594,48 794,0 L794,0 L0,0 Z" fill="#00c853"/>
+        </svg>
+        <!-- 下半分 -->
+        <div class="bottom">
+          <div class="block-left">
+            <div>
+              <div class="block-left-title">売上の<span>8割</span>は、<br>常連さんが作っている。</div>
+              <ul class="ng-list">
+                <li>気づけば常連が来ない</li>
+                <li>お礼や案内は後回し</li>
+                <li>新規集客にばかり出費</li>
+              </ul>
+              <ul class="ok-list">
+                <li>来店後フォロー</li>
+                <li>誕生日・記念日配信</li>
+                <li>休眠客の呼び戻し</li>
+              </ul>
+              <div class="block-accent-left">常連の維持コストは、新規獲得の約1/5。<br>リピーターこそ、利益を支える。<br><span style="font-size:10px; color:#5a8a6a; font-weight:600;">（出典：Bain &amp; Company）</span></div>
+            </div>
+          </div>
+          <div class="block-right">
+            <div class="feature-col">
+              <div class="feature-cat">📅 予約受付</div>
+              <ul class="feature-list">
+                <li>LINEから24時間予約</li>
+                <li>スタッフ・日時を選んで完結</li>
+                <li>Googleカレンダー自動連携</li>
+                <li>電話予約もカレンダーで一元管理</li>
+              </ul>
+              <div class="feature-miss">
+                <span class="miss-label">⚠ よくあるミス</span>
+                手作業の予約管理は時間がかかり、記入漏れ・ダブルブッキングも。
+              </div>
+            </div>
+            <div class="feature-col">
+              <div class="feature-cat" style="display:block;">🔔 リマインド・フォロー<span style="display:block; font-size:9px; color:#888; font-weight:600; margin-top:2px;">（カスタマイズ可能）</span></div>
+              <ul class="feature-list">
+                <li>来店前リマインド自動送信</li>
+                <li>来店後サンキュークーポン</li>
+                <li>誕生日メッセージ（月初＋当日）</li>
+              </ul>
+              <div class="feature-miss">
+                <span class="miss-label">⚠ 配信タイミングで結果は激変</span>
+                <span style="color:#c0392b;">✗ 夜10時にホルモンセット割引 → 逆効果</span><br>
+                <span style="color:#1a6b3a;">✓ 金曜の夕方5時半に定期配信 → 効果大</span>
+              </div>
+            </div>
+            <div class="feature-col">
+              <div class="feature-cat" style="display:block;">📣 リピート促進<span style="display:block; font-size:9px; color:#888; font-weight:600; margin-top:2px;">（カスタマイズ可能）</span></div>
+              <ul class="feature-list">
+                <li>休眠客への呼び戻しメッセージ</li>
+                <li>月次キャンペーン配信</li>
+                <li class="dim">AI FAQ自動返答（プロのみ）</li>
+              </ul>
+              <div class="feature-miss">
+                <span class="miss-label">⚠ よくあるミス</span>
+                週1以上の送りすぎでブロック。大切な常連まで離れてしまう。
+              </div>
+              <div class="feature-accent">設定さえすれば、最適なタイミングで全自動。あなたはカレンダーを見るだけ。</div>
+            </div>
+          </div>
+        </div>
+        <!-- 社名フッター -->
+        <div style="flex-shrink:0; text-align:center; padding:8px 0; font-size:10px; color:#888; border-top:1px solid #eee;">
+          cvilz株式会社　担当　藤田 正伸
+        </div>
+      </div>
+
+      <!-- ============ 裏面 ============ -->
+      <div class="page slide-back">
+        <!-- ヘッダー -->
+        <div class="header">
+          <div>
+            <div class="header-label">LINE × 予約 × 自動化</div>
+            <h1>常連が戻る仕組みが、売上を伸ばす。<span>新規獲得は常連維持の5倍コスト。予約もフォローも LINE におまかせで、リピーターを"資産"に変える。</span></h1>
+          </div>
+          <div class="header-badge">
+            <span class="badge-sub">月額</span>
+            <span class="badge-price">5,000円</span>
+            <span class="badge-unit">（税別）</span>
+          </div>
+        </div>
+        <!-- 本文 -->
+        <div class="body">
+          <div class="col-left">
+            <div class="sec">
+              <div class="sec-title">こんなお悩みありませんか？</div>
+              <div class="needs">
+                <div class="need-card"><span>📞</span>予約の電話対応に追われて、施術や接客に集中できない</div>
+                <div class="need-card"><span>😓</span>常連さんが来なくなっても気づくのが遅れ、手を打てないまま終わる</div>
+              </div>
+            </div>
+            <div class="sec">
+              <div class="sec-title">導入前後の変化</div>
+              <div class="baa-wrap">
+                <div class="baa-col before">
+                  <span class="baa-label">BEFORE</span>
+                  <ul class="baa-list">
+                    <li>📞 電話予約・手書きメモ</li>
+                    <li>⏰ 前日にリマインド電話</li>
+                    <li>📱 お礼・誕生日を手動送信</li>
+                    <li>😰 常連離れに気づかない</li>
+                  </ul>
+                </div>
+                <div class="baa-arrow">→</div>
+                <div class="baa-col after">
+                  <span class="baa-label">AFTER</span>
+                  <ul class="baa-list">
+                    <li>💬 LINE から 24時間予約</li>
+                    <li>🔔 前日・当日に自動お知らせ</li>
+                    <li>🎁 クーポンを自動配信</li>
+                    <li>📣 呼び戻しメッセージ自動送信</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="sec" style="flex: 1; display: flex; flex-direction: column;">
+              <div class="sec-title">実際の画面・届くメッセージ</div>
+              <div class="screenshots-grid" style="flex:1;">
+                <div class="screenshot-item">
+                  <img src="images/liff_menu_select.png" alt="メニュー選択">
+                  <p>予約画面（お客様側）</p>
+                </div>
+                <div class="screenshot-item">
+                  <img src="images/liff_staff_datetime.png" alt="スタッフ・日時選択">
+                  <p>スタッフ・日時選択</p>
+                </div>
+                <div class="screenshot-item">
+                  <img src="images/line_message_birthday_monthly.png" alt="誕生日・月次クーポン配信">
+                  <p>誕生日・月次クーポン配信</p>
+                </div>
+                <div class="screenshot-item">
+                  <img src="images/line_message_reactivation_birthday_today.png" alt="呼び戻し・誕生日当日配信">
+                  <p>呼び戻し・誕生日当日配信</p>
+                </div>
+              </div>
+              <div style="background:#f0fff4; border-left:3px solid #00b900; border-radius:0 6px 6px 0; padding:8px 10px; margin-top:8px; font-size:11px; line-height:1.6; color:#1a6b3a; font-weight:700;">
+                一人ひとりに最適なタイミングで自動配信。"また来たい"を逃さず、リピート率＝売上を底上げします。
+              </div>
+            </div>
+          </div>
+          <div class="col-right">
+            <div class="sec" style="flex: 1; display: flex; flex-direction: column; padding-bottom: 0;">
+              <div class="sec-title">店舗側はGoogleカレンダーで確認</div>
+              <div class="cal-stack" style="padding-bottom: 12px;">
+                <div class="cal-item">
+                  <img src="images/calendar_week_01.png" alt="週表示">
+                  <p>週表示</p>
+                </div>
+                <div class="cal-item">
+                  <img src="images/calendar_day_01.png" alt="予約詳細">
+                  <p>予約詳細</p>
+                </div>
+              </div>
+            </div>
+            <div class="sec" style="flex-shrink: 0;">
+              <div class="sec-title">対応業種</div>
+              <div class="industries">
+                <span class="ind-tag">🐾 ペットサロン</span>
+                <span class="ind-tag">💅 ネイル・まつエク</span>
+                <span class="ind-tag">✂️ 美容室</span>
+                <span class="ind-tag">💪 パーソナルトレーニング</span>
+                <span class="ind-tag">🩰 社交ダンス・ヨガ</span>
+              </div>
+            </div>
+            <div class="sec" style="flex-shrink: 0;">
+              <div class="sec-title">料金プラン</div>
+              <div class="price-wrap">
+                <div class="price-card basic">
+                  <div class="rec-badge">おすすめ</div>
+                  <div class="plan-name">ベーシック</div>
+                  <div class="plan-catch">LINEマーケティングの8割をこれ1つでカバー</div>
+                  <div class="plan-price-row">
+                    <span class="plan-price">5,000</span>
+                    <span class="plan-unit">円/月</span>
+                  </div>
+                  <div class="plan-initial">初期構築費 200,000円</div>
+                  <ul class="plan-features">
+                    <li>LINE予約・Googleカレンダー連携</li>
+                    <li>リマインド自動送信</li>
+                    <li>クーポン・呼び戻し配信</li>
+                  </ul>
+                </div>
+                <div class="price-card pro">
+                  <div class="plan-name">プロ</div>
+                  <div class="plan-catch">AI自動返答・配信カスタムをさらに強化</div>
+                  <div class="plan-price-row">
+                    <span class="plan-price">7,500</span>
+                    <span class="plan-unit">円/月</span>
+                  </div>
+                  <div class="plan-initial">初期構築費 500,000円</div>
+                  <ul class="plan-features">
+                    <li>ベーシックの全機能</li>
+                    <li>AI FAQ 自動返答</li>
+                    <li>配信 最大5種カスタム</li>
+                  </ul>
+                </div>
+              </div>
+              <div style="background: linear-gradient(135deg,#fff4d6,#fffbe9); border: 2px solid #ffc107; border-radius: 8px; padding: 11px 13px; margin-top: 10px; font-size: 12px; line-height: 1.7;">
+                🏛️ <strong style="font-size:13px; color:#b8860b;">補助金で実質負担を大きく軽減</strong><br>
+                小規模事業者持続化補助金・業務改善助成金などが使えます。<br>
+                <strong style="color:#00963c;">申請の面倒な手続きは、無料で最後まで伴走</strong><span style="color:#666;">。だから「やってみたい」がすぐ始められます。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 社名フッター -->
+        <div style="flex-shrink:0; text-align:center; padding:8px 0; font-size:10px; color:#888; border-top:1px solid #eee;">
+          cvilz株式会社　担当　藤田 正伸
+        </div>
+      </div>
+
+    </div><!-- /track -->
+  </div><!-- /stage -->
+</div><!-- /viewport -->
+
+<!-- ナビ -->
+<button class="nav-arrow nav-prev" id="prev" aria-label="前へ">‹</button>
+<button class="nav-arrow nav-next" id="next" aria-label="次へ">›</button>
+<div class="dots">
+  <button class="dot active" data-i="0" aria-label="表面"></button>
+  <button class="dot" data-i="1" aria-label="裏面"></button>
+  <span class="dot-label" id="dotLabel">表面</span>
+</div>
+<div class="swipe-hint" id="hint">← スワイプで裏面へ →</div>
+
+<script>
+  (function () {
+    var PAGE_W = 794, PAGE_H = 1123;
+    var index = 0, total = 2;
+    var track = document.getElementById('track');
+    var stage = document.getElementById('stage');
+    var viewport = document.querySelector('.slider-viewport');
+    var prevBtn = document.getElementById('prev');
+    var nextBtn = document.getElementById('next');
+    var dots = Array.prototype.slice.call(document.querySelectorAll('.dot'));
+    var dotLabel = document.getElementById('dotLabel');
+    var labels = ['表面', '裏面'];
+
+    // A4を画面に収めるスケール計算
+    function fit() {
+      var availW = window.innerWidth;
+      var availH = window.innerHeight - 90; // ナビ・余白分
+      var scale = Math.min(availW / PAGE_W, availH / PAGE_H, 1);
+      stage.style.transform = 'scale(' + scale + ')';
+      // スケール後の実寸に合わせて viewport の高さを調整
+      stage.style.marginBottom = (PAGE_H * scale - PAGE_H) + 'px';
+    }
+
+    function update() {
+      track.style.transform = 'translateX(' + (-index * PAGE_W) + 'px)';
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === index); });
+      dotLabel.textContent = labels[index];
+      prevBtn.disabled = (index === 0);
+      nextBtn.disabled = (index === total - 1);
+    }
+
+    function go(i) {
+      index = Math.max(0, Math.min(total - 1, i));
+      update();
+    }
+
+    prevBtn.addEventListener('click', function () { go(index - 1); });
+    nextBtn.addEventListener('click', function () { go(index + 1); });
+    dots.forEach(function (d) {
+      d.addEventListener('click', function () { go(parseInt(d.dataset.i, 10)); });
+    });
+
+    // キーボード
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') go(index - 1);
+      if (e.key === 'ArrowRight') go(index + 1);
+    });
+
+    // スワイプ
+    var startX = null;
+    viewport.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
+    viewport.addEventListener('touchend', function (e) {
+      if (startX === null) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 40) { go(dx < 0 ? index + 1 : index - 1); }
+      startX = null;
+    });
+
+    window.addEventListener('resize', fit);
+    fit();
+    update();
+  })();
+</script>
+
+</body>
+</html>
