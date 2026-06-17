@@ -15,29 +15,37 @@
     }
 
     /* ===== スライダー全体 ===== */
+    /* viewport はナビを除いた画面全体。中身は JS が scale で収める */
     .slider-viewport {
       width: 100%;
-      min-height: 100vh;
+      height: calc(100vh - 70px);
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: 16px 0 70px;
+      overflow: hidden;
+      background: #e8f3ea;
+    }
+
+    /* scale後の実寸（JSがwidth/heightをセット）。これがレイアウト上の占有面積 */
+    .stage-wrap {
+      flex-shrink: 0;
+      position: relative;
       overflow: hidden;
     }
 
-    /* スケール調整のための外枠（A4を画面幅に収める） */
+    /* A4実寸。transform-origin: top left でスケール */
     .stage {
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 794px;
       height: 1123px;
-      transform-origin: top center;
-      /* JSで transform: scale() を設定 */
+      transform-origin: top left;
     }
 
     .track {
       display: flex;
-      width: 1588px; /* 794 * 2 */
+      width: 1588px; /* 794 × 2 */
       height: 1123px;
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -128,7 +136,7 @@
        ========================================================= */
     .slide-front .hero {
       background: linear-gradient(160deg, #00b900 0%, #00c853 60%, #00e676 100%);
-      flex: 0 0 56%;
+      flex: 0 0 auto;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 32px 60px 24px; position: relative; text-align: center;
@@ -225,10 +233,40 @@
       font-size: 15px; color: #fff; font-weight: 600; margin-top: 8px;
       line-height: 1.7; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.25);
     }
+    /* CTAの上に置く「登録したら見られる」吹き出し（下向き矢印でボタンを指す） */
+    .slide-front .join-bubble {
+      position: relative; display: inline-block; background: #fff;
+      color: #1a8a3a; font-size: 14px; font-weight: 800;
+      padding: 10px 22px; border-radius: 24px; margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18); line-height: 1.5;
+    }
+    .slide-front .join-bubble strong { color: #00963c; font-weight: 900; }
+    .slide-front .join-bubble::after {
+      content: ''; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%);
+      border-left: 9px solid transparent; border-right: 9px solid transparent;
+      border-top: 9px solid #fff;
+    }
     .slide-front .wave { flex-shrink: 0; display: block; margin-top: -2px; }
-    .slide-front .bottom { flex: 1; display: grid; grid-template-columns: 220px 1fr; gap: 0; }
+    .slide-front .bottom { flex: 1; display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 1fr auto; gap: 0; }
+    /* 「ITが苦手でも大丈夫」の締めバナー（下段フルワイド） */
+    .slide-front .easy-banner {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #00b900, #00c853);
+      color: #fff; padding: 12px 24px; display: flex; align-items: center;
+      justify-content: center; gap: 14px; text-align: center;
+    }
+    .slide-front .easy-banner .easy-main {
+      font-size: 16px; font-weight: 900; line-height: 1.4;
+    }
+    .slide-front .easy-banner .easy-main em {
+      font-style: normal; background: rgba(255,255,255,0.25);
+      border-radius: 5px; padding: 0 6px;
+    }
+    .slide-front .easy-banner .easy-sub {
+      font-size: 11.5px; font-weight: 600; opacity: 0.95; line-height: 1.5;
+    }
     .slide-front .block-left {
-      padding: 20px 20px 20px 24px; border-right: 2px solid #e8e8e8;
+      grid-row: 1; padding: 20px 20px 20px 24px; border-right: 2px solid #e8e8e8;
       display: flex; flex-direction: column; justify-content: space-between;
     }
     .slide-front .block-left-title {
@@ -246,7 +284,7 @@
       border-radius: 0 6px 6px 0; padding: 10px 12px; font-size: 12.5px;
       color: #1a6b3a; font-weight: 700; line-height: 1.65;
     }
-    .slide-front .block-right { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .slide-front .block-right { grid-row: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; }
     .slide-front .feature-col {
       padding: 18px 16px 16px; border-right: 1px solid #f0f0f0;
       display: flex; flex-direction: column; position: relative;
@@ -261,14 +299,20 @@
       display: flex; align-items: center; gap: 5px;
       border-bottom: 1px solid #d0eed8; padding-bottom: 7px;
     }
-    .slide-front .feature-list { list-style: none; display: grid; gap: 7px; flex: 1; }
+    .slide-front .feature-list { list-style: none; display: grid; gap: 11px; flex: 1; }
     .slide-front .feature-list li {
-      font-size: 12px; color: #333; line-height: 1.5;
+      font-size: 13px; color: #1a1a1a; line-height: 1.45; font-weight: 800;
       display: flex; gap: 6px; align-items: flex-start;
     }
-    .slide-front .feature-list li::before { content: '›'; color: #00b900; font-weight: 900; font-size: 14px; flex-shrink: 0; }
-    .slide-front .feature-list li.dim { color: #aaa; font-size: 11px; }
+    .slide-front .feature-list li::before { content: '✓'; color: #00b900; font-weight: 900; font-size: 14px; flex-shrink: 0; }
+    /* 効果の下に添える「お店が楽になる理由」 */
+    .slide-front .feature-list li .why {
+      display: block; font-size: 10.5px; color: #5a8a6a; font-weight: 600;
+      line-height: 1.45; margin-top: 2px;
+    }
+    .slide-front .feature-list li.dim { color: #aaa; font-weight: 700; }
     .slide-front .feature-list li.dim::before { color: #ccc; }
+    .slide-front .feature-list li.dim .why { color: #bbb; }
     .slide-front .feature-accent {
       margin-top: 10px; background: #f0fff4; border-left: 3px solid #00b900;
       border-radius: 0 6px 6px 0; padding: 9px 11px; font-size: 13px;
@@ -376,14 +420,41 @@
     .slide-back .plan-features li::before { content: '✓'; color: #00b900; font-weight: 700; }
 
     @media print {
-      body { background: #fff; }
-      .nav-arrow, .dots, .swipe-hint { display: none; }
+      /* A4・余白ゼロ。ブラウザのデフォルト余白で見切れるのを防ぐ */
+      @page { size: A4; margin: 0; }
+      html, body { background: #fff; width: 210mm; }
+
+      /* 画面用のスライダー機構（scale・横スライド・overflow）をすべて解除 */
+      .nav-arrow, .dots, .swipe-hint { display: none !important; }
+      .slider-viewport { display: block; height: auto; overflow: visible; }
+      .stage-wrap { width: auto; height: auto; overflow: visible; position: static; }
+      .stage {
+        position: static; width: auto; height: auto;
+        transform: none !important;
+      }
+      .track {
+        display: block; width: auto; height: auto;
+        transform: none !important; transition: none;
+      }
+
+      /* 各ページを A4 実寸で縦に積み、1枚ずつ改ページ */
+      .page {
+        width: 210mm; height: 297mm;
+        box-shadow: none; overflow: hidden;
+        break-inside: avoid; page-break-inside: avoid;
+        page-break-after: always; break-after: page;
+      }
+      .page:last-child { page-break-after: auto; break-after: auto; }
+
+      /* 印刷では社名フッターを出さない */
+      .print-hide { display: none !important; }
     }
   </style>
 </head>
 <body>
 
 <div class="slider-viewport">
+  <div class="stage-wrap" id="stageWrap">
   <div class="stage" id="stage">
     <div class="track" id="track">
 
@@ -391,23 +462,17 @@
       <div class="page slide-front">
         <!-- ヒーロー -->
         <div class="hero">
-          <div class="ratio-badge">
-            <span class="r-unit">買い切り後はずっと</span>
-            <span class="r-num"><small>月額</small><span class="big0">0</span><small>円</small></span>
-            <span class="r-unit"></span>
-          </div>
           <div class="hero-label">LINE × リピーター × 売上アップ</div>
-          <h1>リピーターこそ、<em>最強の売上。</em><br>LINEが自動で連れ戻す。</h1>
+          <h1>常連が戻る仕組み、<br>毎月<em>ずっと0円。</em></h1>
           <p class="hero-sub">
-            新規集客は、常連を保つ<strong style="background:rgba(255,255,255,0.2);border-radius:5px;padding:0 6px;">5倍</strong>のコスト。<br>
-            「また来たい」をLINEが自動でつくり、売上を伸ばします。<br>
-            <strong>補助金で賢く買い切り。あとは、ずーっと0円。</strong>
+            予約も、お礼も、常連の呼び戻しも、LINEが全部自動。<br>
+            <strong>まずはLINEを見るだけ。それだけでOKです。</strong>
           </p>
           <div class="price-hero">
             <div class="price-box-other">
               <div class="pb-label">大手ツール 月額</div>
-              <div class="pb-num">41,780</div>
-              <div class="pb-unit">円〜（Lステップ）</div>
+              <div class="pb-num">約20,000</div>
+              <div class="pb-unit">円〜（L社）</div>
             </div>
             <div class="vs-arrow">→</div>
             <div class="price-box">
@@ -417,20 +482,16 @@
               <div class="pb-unit">円（買い切り後）</div>
             </div>
           </div>
-          <div class="price-note">
-            初期費用 <strong>20万円の買い切り</strong>（プロ50万円）。<br>
-            <strong>補助金を使えば実質5万円前後</strong>で導入でき、<strong>あとは毎月ずっと0円</strong>です。
-          </div>
+          <div class="join-bubble">今すぐ登録！ <strong>デモ体験・よくある質問・個別無料相談</strong>はLINEから👀</div>
           <div class="hero-cta">
             <div class="hero-cta-qr">
               <img src="images/M_gainfriends_2dbarcodes_GW.png" alt="LINE友だち追加QR">
               <span>QRで友だち追加</span>
             </div>
-            <a href="https://lin.ee/OIsoJvM" class="hero-cta-btn">📱 lineで完結！デモはこちら</a>
+            <a href="https://lin.ee/OIsoJvM" class="hero-cta-btn">📱 まずはLINEを見てみる</a>
           </div>
-          <div class="subsidy-bubble">🏛️ 補助金無料サポート中！賢く5万円前後で入れちゃいましょう</div>
+          <div class="subsidy-bubble">🏛️ 補助金で実質5万円前後！ 補助金相談もLINEから無料でできます</div>
           <p class="hero-cta-note">
-            友だち追加後、説明資料・デモ体験・無料相談メニューが見れます。<br>
             <span style="background:rgba(255,255,255,0.95); color:#1a8a3a; font-weight:800; padding:2px 8px; border-radius:5px;">こちらから営業メールを送ることはないのでご安心ください。</span>
           </p>
         </div>
@@ -448,58 +509,44 @@
                 <li>お礼や案内は後回し</li>
                 <li>新規集客にばかり出費</li>
               </ul>
-              <ul class="ok-list">
-                <li>来店後フォロー</li>
-                <li>誕生日・記念日配信</li>
-                <li>休眠客の呼び戻し</li>
-              </ul>
-              <div class="block-accent-left">常連の維持コストは、新規獲得の約1/5。<br>リピーターこそ、利益を支える。<br><span style="font-size:10px; color:#5a8a6a; font-weight:600;">（出典：Bain &amp; Company）</span></div>
+              <div class="block-accent-left">この「あるある」を、<br>右の仕組みが<strong style="color:#00963c;">全部自動</strong>で防ぎます。 →<br><span style="font-size:10px; color:#5a8a6a; font-weight:600; display:block; margin-top:6px;">常連の維持コストは新規獲得の約1/5（出典：Bain &amp; Company）</span></div>
             </div>
           </div>
           <div class="block-right">
             <div class="feature-col">
-              <div class="feature-cat">📅 予約受付</div>
+              <div class="feature-cat">📅 予約が、ラクになる</div>
               <ul class="feature-list">
-                <li>LINEから24時間予約</li>
-                <li>スタッフ・日時を選んで完結</li>
-                <li>Googleカレンダー自動連携</li>
-                <li>電話予約もカレンダーで一元管理</li>
+                <li>LINEから24時間ネット予約<span class="why">夜中でもお客様が自分で予約。電話対応に追われない</span></li>
+                <li>日時もスタッフも選んで完結<span class="why">その場で確定するから、やりとりの往復が消える</span></li>
+                <li>カレンダーに自動で記入<span class="why">電話予約も1か所に集約。ダブルブッキングを防ぐ</span></li>
               </ul>
-              <div class="feature-miss">
-                <span class="miss-label">⚠ よくあるミス</span>
-                手作業の予約管理は時間がかかり、記入漏れ・ダブルブッキングも。
-              </div>
             </div>
             <div class="feature-col">
-              <div class="feature-cat" style="display:block;">🔔 リマインド・フォロー<span style="display:block; font-size:9px; color:#888; font-weight:600; margin-top:2px;">（カスタマイズ可能）</span></div>
+              <div class="feature-cat">🔔 来店忘れを、防ぐ</div>
               <ul class="feature-list">
-                <li>来店前リマインド自動送信</li>
-                <li>来店後サンキュークーポン</li>
-                <li>誕生日メッセージ（月初＋当日）</li>
+                <li>前日リマインドを自動送信<span class="why">うっかり忘れによる無断キャンセルが減る</span></li>
+                <li>来店後にサンキュークーポン<span class="why">「また来たい」を来店直後にそっと後押し</span></li>
+                <li>誕生日メッセージを自動送信<span class="why">手間ゼロで「覚えていてくれた」と喜ばれる</span></li>
               </ul>
-              <div class="feature-miss">
-                <span class="miss-label">⚠ 配信タイミングで結果は激変</span>
-                <span style="color:#c0392b;">✗ 夜10時にホルモンセット割引 → 逆効果</span><br>
-                <span style="color:#1a6b3a;">✓ 金曜の夕方5時半に定期配信 → 効果大</span>
-              </div>
             </div>
             <div class="feature-col">
-              <div class="feature-cat" style="display:block;">📣 リピート促進<span style="display:block; font-size:9px; color:#888; font-weight:600; margin-top:2px;">（カスタマイズ可能）</span></div>
+              <div class="feature-cat">📣 常連を、呼び戻す</div>
               <ul class="feature-list">
-                <li>休眠客への呼び戻しメッセージ</li>
-                <li>月次キャンペーン配信</li>
-                <li class="dim">AI FAQ自動返答（プロのみ）</li>
+                <li>離れたお客様に自動で声かけ<span class="why">「そろそろどうですか」を、離れる前に届ける</span></li>
+                <li>月1キャンペーンを自動配信<span class="why">送り忘れなし。ブロックされない頻度に調整済み</span></li>
+                <li class="dim">AIが問い合わせに自動返答<span class="why">プロプランのみ。よくある質問に24時間対応</span></li>
               </ul>
-              <div class="feature-miss">
-                <span class="miss-label">⚠ よくあるミス</span>
-                週1以上の送りすぎでブロック。大切な常連まで離れてしまう。
-              </div>
-              <div class="feature-accent">設定さえすれば、最適なタイミングで全自動。あなたはカレンダーを見るだけ。</div>
+            </div>
+          </div>
+          <div class="easy-banner">
+            <div>
+              <div class="easy-main">パソコンも、難しい操作も<em>いりません。</em></div>
+              <div class="easy-sub">設定は最初の1回だけ。あとは全部おまかせで、あなたは<strong>LINEとカレンダーを見るだけ</strong>。</div>
             </div>
           </div>
         </div>
         <!-- 社名フッター -->
-        <div style="flex-shrink:0; text-align:center; padding:8px 0; font-size:10px; color:#888; border-top:1px solid #eee;">
+        <div class="print-hide" style="flex-shrink:0; text-align:center; padding:8px 0; font-size:10px; color:#888; border-top:1px solid #eee;">
           cvilz株式会社　担当　藤田 正伸
         </div>
       </div>
@@ -522,10 +569,9 @@
         <div class="body">
           <div class="col-left">
             <div class="sec">
-              <div class="sec-title">こんなお悩みありませんか？</div>
+              <div class="sec-title">予約ページ、無料でおつくりします</div>
               <div class="needs">
-                <div class="need-card"><span>📞</span>予約の電話対応に追われて、施術や接客に集中できない</div>
-                <div class="need-card"><span>😓</span>常連さんが来なくなっても気づくのが遅れ、手を打てないまま終わる</div>
+                <div class="need-card"><span>🎁</span><span>施術メニューを送っていただいたら、お客様の予約ページを<strong>無料</strong>でおつくりします。LINE登録後、お気軽にお申し付けください。</span></div>
               </div>
             </div>
             <div class="sec">
@@ -643,13 +689,14 @@
           </div>
         </div>
         <!-- 社名フッター -->
-        <div style="flex-shrink:0; text-align:center; padding:8px 0; font-size:10px; color:#888; border-top:1px solid #eee;">
+        <div class="print-hide" style="flex-shrink:0; text-align:center; padding:8px 0; font-size:10px; color:#888; border-top:1px solid #eee;">
           cvilz株式会社　担当　藤田 正伸
         </div>
       </div>
 
     </div><!-- /track -->
   </div><!-- /stage -->
+  </div><!-- /stageWrap -->
 </div><!-- /viewport -->
 
 <!-- ナビ -->
@@ -666,23 +713,25 @@
   (function () {
     var PAGE_W = 794, PAGE_H = 1123;
     var index = 0, total = 2;
-    var track = document.getElementById('track');
-    var stage = document.getElementById('stage');
-    var viewport = document.querySelector('.slider-viewport');
-    var prevBtn = document.getElementById('prev');
-    var nextBtn = document.getElementById('next');
-    var dots = Array.prototype.slice.call(document.querySelectorAll('.dot'));
-    var dotLabel = document.getElementById('dotLabel');
-    var labels = ['表面', '裏面'];
+    var track     = document.getElementById('track');
+    var stage     = document.getElementById('stage');
+    var stageWrap = document.getElementById('stageWrap');
+    var viewport  = document.querySelector('.slider-viewport');
+    var prevBtn   = document.getElementById('prev');
+    var nextBtn   = document.getElementById('next');
+    var dots      = Array.prototype.slice.call(document.querySelectorAll('.dot'));
+    var dotLabel  = document.getElementById('dotLabel');
+    var labels    = ['表面', '裏面'];
 
-    // A4を画面に収めるスケール計算
     function fit() {
       var availW = window.innerWidth;
-      var availH = window.innerHeight - 90; // ナビ・余白分
-      var scale = Math.min(availW / PAGE_W, availH / PAGE_H, 1);
+      var availH = window.innerHeight - 70; // ドットナビ分
+      var scale  = Math.min(availW / PAGE_W, availH / PAGE_H, 1);
+      // stage を縮小
       stage.style.transform = 'scale(' + scale + ')';
-      // スケール後の実寸に合わせて viewport の高さを調整
-      stage.style.marginBottom = (PAGE_H * scale - PAGE_H) + 'px';
+      // stageWrap でレイアウト上の占有面積 = スケール後の実寸
+      stageWrap.style.width  = (PAGE_W * scale) + 'px';
+      stageWrap.style.height = (PAGE_H * scale) + 'px';
     }
 
     function update() {
