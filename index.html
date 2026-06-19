@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>LINE予約システム｜Web版チラシ</title>
+  <title>ペットサロン専用 LINE予約システム｜Web版チラシ</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -139,24 +139,29 @@
       flex: 0 0 auto;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 32px 60px 24px; position: relative; text-align: center;
+      padding: 26px 60px 22px; position: relative; text-align: center;
     }
     .slide-front .hero-label {
       display: inline-block; background: rgba(255,255,255,0.22); color: #fff;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
-      padding: 4px 14px; border-radius: 20px; margin-bottom: 22px;
+      font-size: 13px; font-weight: 800; letter-spacing: 0.12em;
+      padding: 5px 16px; border-radius: 20px; margin-bottom: 16px;
+    }
+    .slide-front .hero-label .label-pro {
+      background: #FFE600; color: #1a6b3a; font-weight: 900;
+      padding: 1px 8px; border-radius: 12px; margin: 0 2px;
+      font-size: 14px; letter-spacing: 0.04em;
     }
     .slide-front .hero h1 {
-      color: #fff; font-size: 46px; font-weight: 900;
-      line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 16px;
+      color: #fff; font-size: 40px; font-weight: 900;
+      line-height: 1.22; letter-spacing: -0.02em; margin-bottom: 14px;
     }
     .slide-front .hero h1 em {
       font-style: normal; background: rgba(255,255,255,0.2);
       border-radius: 6px; padding: 0 6px;
     }
     .slide-front .hero-sub {
-      color: rgba(255,255,255,0.95); font-size: 16px; font-weight: 600;
-      line-height: 1.7; margin-bottom: 20px;
+      color: rgba(255,255,255,0.95); font-size: 15px; font-weight: 600;
+      line-height: 1.6; margin-bottom: 16px;
     }
     .slide-front .price-hero { display: flex; align-items: center; gap: 20px; }
     .slide-front .price-note {
@@ -200,17 +205,17 @@
     .slide-front .ratio-badge .r-num .big0 { font-size: 38px; line-height: 1; }
     .slide-front .ratio-badge .r-unit { font-size: 9px; color: #555; font-weight: 700; }
     .slide-front .hero-cta {
-      display: flex; align-items: center; gap: 16px; margin-top: 22px;
+      display: flex; align-items: center; gap: 16px; margin-top: 14px;
       flex-wrap: wrap; justify-content: center;
     }
     .slide-front .hero-cta-qr { text-align: center; }
     .slide-front .hero-cta-qr img {
-      width: 64px; height: 64px; border-radius: 6px; background: #fff;
-      padding: 4px; display: block;
+      width: 92px; height: 92px; border-radius: 7px; background: #fff;
+      padding: 5px; display: block;
     }
     .slide-front .hero-cta-qr span {
-      font-size: 8px; color: rgba(255,255,255,0.85); font-weight: 700;
-      margin-top: 2px; display: block;
+      font-size: 9px; color: rgba(255,255,255,0.85); font-weight: 700;
+      margin-top: 3px; display: block;
     }
     .slide-front .hero-cta-btn {
       display: inline-block; background: #fff; color: #00b900;
@@ -221,7 +226,7 @@
     .slide-front .subsidy-bubble {
       position: relative; display: inline-block; background: #fff3cd;
       color: #8a6d00; font-size: 15px; font-weight: 900;
-      padding: 9px 20px; border-radius: 24px; margin-top: 14px;
+      padding: 9px 20px; border-radius: 24px; margin-top: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.18);
     }
     .slide-front .subsidy-bubble::after {
@@ -462,11 +467,12 @@
       <div class="page slide-front">
         <!-- ヒーロー -->
         <div class="hero">
-          <div class="hero-label">LINE × リピーター × 売上アップ</div>
-          <h1>常連が戻る仕組み、<br>毎月<em>ずっと0円。</em></h1>
-          <p class="hero-sub">
-            予約も、お礼も、常連の呼び戻しも、LINEが全部自動。<br>
-            <strong>まずはLINEを見るだけ。それだけでOKです。</strong>
+          <div class="hero-label">ペットサロン<span class="label-pro">専用</span> × 犬種別配信 × リピーター</div>
+          <h1><em>小型・中型・大型</em>のワンちゃんごとに、<br>「ちょうどいい」LINEが届く。</h1>
+          <p class="hero-sub" style="white-space:nowrap;">
+            予約・リマインド・呼び戻しはもちろん、<br>
+            <strong>犬種・サイズ別に最適なメッセージを自動で送り分け。</strong><br>
+            ペットサロンに欲しい機能が、これ1つで全部そろう。
           </p>
           <div class="price-hero">
             <div class="price-box-other">
@@ -482,7 +488,7 @@
               <div class="pb-unit">円（買い切り後）</div>
             </div>
           </div>
-          <div class="join-bubble">今すぐ登録！ <strong>デモ体験・よくある質問・個別無料相談</strong>はLINEから👀</div>
+          <div class="join-bubble" style="margin-top:6px;">デモ体験も相談も<strong>LINEよりどうぞ！</strong>👀<br>先着順でのご案内です</div>
           <div class="hero-cta">
             <div class="hero-cta-qr">
               <img src="images/M_gainfriends_2dbarcodes_GW.png" alt="LINE友だち追加QR">
@@ -503,39 +509,40 @@
         <div class="bottom">
           <div class="block-left">
             <div>
-              <div class="block-left-title">売上の<span>8割</span>は、<br>常連さんが作っている。</div>
+              <div class="block-left-title">小型も大型も、<br><span>同じ案内</span>でいいの？</div>
               <ul class="ng-list">
-                <li>気づけば常連が来ない</li>
-                <li>お礼や案内は後回し</li>
-                <li>新規集客にばかり出費</li>
+                <li>全員に同じ一斉配信で響かない</li>
+                <li>犬種ごとの周期を覚えきれない</li>
+                <li>気づけば常連が来なくなる</li>
               </ul>
               <div class="block-accent-left">この「あるある」を、<br>右の仕組みが<strong style="color:#00963c;">全部自動</strong>で防ぎます。 →<br><span style="font-size:10px; color:#5a8a6a; font-weight:600; display:block; margin-top:6px;">常連の維持コストは新規獲得の約1/5（出典：Bain &amp; Company）</span></div>
             </div>
           </div>
           <div class="block-right">
             <div class="feature-col">
-              <div class="feature-cat">📅 予約が、ラクになる</div>
+              <div class="feature-cat">📅 トリミング予約が、ラクに</div>
               <ul class="feature-list">
-                <li>LINEから24時間ネット予約<span class="why">夜中でもお客様が自分で予約。電話対応に追われない</span></li>
-                <li>日時もスタッフも選んで完結<span class="why">その場で確定するから、やりとりの往復が消える</span></li>
+                <li>LINEから24時間ネット予約<span class="why">夜中でも飼い主さんが自分で予約。電話対応に追われない</span></li>
+                <li>犬種・日時を選んで完結<span class="why">その場で確定するから、やりとりの往復が消える</span></li>
                 <li>カレンダーに自動で記入<span class="why">電話予約も1か所に集約。ダブルブッキングを防ぐ</span></li>
               </ul>
             </div>
             <div class="feature-col">
-              <div class="feature-cat">🔔 来店忘れを、防ぐ</div>
+              <div class="feature-cat">🔔 忘れ防止と、呼び戻し</div>
               <ul class="feature-list">
                 <li>前日リマインドを自動送信<span class="why">うっかり忘れによる無断キャンセルが減る</span></li>
-                <li>来店後にサンキュークーポン<span class="why">「また来たい」を来店直後にそっと後押し</span></li>
-                <li>誕生日メッセージを自動送信<span class="why">手間ゼロで「覚えていてくれた」と喜ばれる</span></li>
+                <li>そろそろの時期に自動でお声がけ<span class="why">犬種ごとの周期で「そろそろですよ」を届ける</span></li>
+                <li>ワンちゃんの誕生日メッセージを自動<span class="why">手間ゼロで「覚えていてくれた」と喜ばれる</span></li>
               </ul>
             </div>
             <div class="feature-col">
-              <div class="feature-cat">📣 常連を、呼び戻す</div>
+              <div class="feature-cat">🐕 犬種・サイズ別に送り分け</div>
               <ul class="feature-list">
-                <li>離れたお客様に自動で声かけ<span class="why">「そろそろどうですか」を、離れる前に届ける</span></li>
-                <li>月1キャンペーンを自動配信<span class="why">送り忘れなし。ブロックされない頻度に調整済み</span></li>
-                <li class="dim">AIが問い合わせに自動返答<span class="why">プロプランのみ。よくある質問に24時間対応</span></li>
+                <li><strong style="color:#00963c;">小型犬</strong>に最適な提案<span class="why">短い周期での足裏・肛門ケア</span></li>
+                <li><strong style="color:#00963c;">中型犬</strong>に最適な提案<span class="why">換毛期の抜け毛ケア</span></li>
+                <li><strong style="color:#00963c;">大型犬</strong>に最適な提案<span class="why">夏のサマーカット提案</span></li>
               </ul>
+              <div class="feature-accent">"うちの子向け"だから来店につながる。</div>
             </div>
           </div>
           <div class="easy-banner">
@@ -556,8 +563,8 @@
         <!-- ヘッダー -->
         <div class="header">
           <div>
-            <div class="header-label">LINE × 予約 × 自動化</div>
-            <h1>常連が戻る仕組みが、売上を伸ばす。<span>新規獲得は常連維持の5倍コスト。予約もフォローも LINE におまかせで、リピーターを"資産"に変える。</span></h1>
+            <div class="header-label">ペットサロン専用 × 犬種別配信 × 自動化</div>
+            <h1>小型・中型・大型、ワンちゃんごとに送り分けるから売上が伸びる。<span>予約・リマインド・呼び戻しに加え、犬種・サイズ別の最適配信まで。ペットサロンに欲しい機能が、これ1つで全部そろう。</span></h1>
           </div>
           <div class="header-badge">
             <span class="badge-sub">買い切り後</span>
@@ -571,7 +578,7 @@
             <div class="sec">
               <div class="sec-title">予約ページ、無料でおつくりします</div>
               <div class="needs">
-                <div class="need-card"><span>🎁</span><span>施術メニューを送っていただいたら、お客様の予約ページを<strong>無料</strong>でおつくりします。LINE登録後、お気軽にお申し付けください。</span></div>
+                <div class="need-card"><span>🎁</span><span>トリミングメニュー（料金表）を送っていただいたら、お店の予約ページを<strong>無料</strong>でおつくりします。LINE登録後、お気軽にお申し付けください。</span></div>
               </div>
             </div>
             <div class="sec">
@@ -580,20 +587,20 @@
                 <div class="baa-col before">
                   <span class="baa-label">BEFORE</span>
                   <ul class="baa-list">
-                    <li>📞 電話予約・手書きメモ</li>
+                    <li>📞 電話予約・手書きの台帳</li>
                     <li>⏰ 前日にリマインド電話</li>
                     <li>📱 お礼・誕生日を手動送信</li>
-                    <li>😰 常連離れに気づかない</li>
+                    <li>😰 ご無沙汰の常連に気づかない</li>
                   </ul>
                 </div>
                 <div class="baa-arrow">→</div>
                 <div class="baa-col after">
                   <span class="baa-label">AFTER</span>
                   <ul class="baa-list">
-                    <li>💬 LINE から 24時間予約</li>
+                    <li>💬 LINE から 24時間トリミング予約</li>
                     <li>🔔 前日・当日に自動お知らせ</li>
-                    <li>🎁 クーポンを自動配信</li>
-                    <li>📣 呼び戻しメッセージ自動送信</li>
+                    <li>🐾 犬種別クーポンを自動配信</li>
+                    <li>📣 そろそろの時期に自動お声がけ</li>
                   </ul>
                 </div>
               </div>
@@ -602,20 +609,20 @@
               <div class="sec-title">実際の画面・届くメッセージ</div>
               <div class="screenshots-grid" style="flex:1;">
                 <div class="screenshot-item">
-                  <img src="images/liff_menu_select.png" alt="メニュー選択">
-                  <p>予約画面（お客様側）</p>
+                  <img src="images/liff_menu_select.png" alt="コース選択">
+                  <p>予約画面（飼い主さん側）</p>
                 </div>
                 <div class="screenshot-item">
                   <img src="images/liff_staff_datetime.png" alt="スタッフ・日時選択">
                   <p>スタッフ・日時選択</p>
                 </div>
                 <div class="screenshot-item">
-                  <img src="images/line_message_birthday_monthly.png" alt="誕生日・月次クーポン配信">
-                  <p>誕生日・月次クーポン配信</p>
+                  <img src="images/line_message_birthday_monthly.png" alt="犬種別・誕生日クーポン配信">
+                  <p>犬種別・誕生日クーポン配信</p>
                 </div>
                 <div class="screenshot-item">
-                  <img src="images/line_message_reactivation_birthday_today.png" alt="呼び戻し・誕生日当日配信">
-                  <p>呼び戻し・誕生日当日配信</p>
+                  <img src="images/line_message_reactivation_birthday_today.png" alt="そろそろ・誕生日当日配信">
+                  <p>そろそろ提案・誕生日当日配信</p>
                 </div>
               </div>
               <div style="background:#f0fff4; border-left:3px solid #00b900; border-radius:0 6px 6px 0; padding:8px 10px; margin-top:8px; font-size:11px; line-height:1.6; color:#1a6b3a; font-weight:700;">
@@ -638,13 +645,13 @@
               </div>
             </div>
             <div class="sec" style="flex-shrink: 0;">
-              <div class="sec-title">対応業種</div>
+              <div class="sec-title">こんなペットサロンに</div>
               <div class="industries">
-                <span class="ind-tag">🐾 ペットサロン</span>
-                <span class="ind-tag">💅 ネイル・まつエク</span>
-                <span class="ind-tag">✂️ 美容室</span>
-                <span class="ind-tag">💪 パーソナルトレーニング</span>
-                <span class="ind-tag">🩰 社交ダンス・ヨガ</span>
+                <span class="ind-tag">🐩 トリミングサロン</span>
+                <span class="ind-tag">🐾 ペットホテル併設</span>
+                <span class="ind-tag">🚐 出張トリミング</span>
+                <span class="ind-tag">🐱 猫専門サロン</span>
+                <span class="ind-tag">🏠 個人サロン（1〜2名）</span>
               </div>
             </div>
             <div class="sec" style="flex-shrink: 0;">
@@ -653,7 +660,7 @@
                 <div class="price-card basic">
                   <div class="rec-badge">おすすめ</div>
                   <div class="plan-name">ベーシック</div>
-                  <div class="plan-catch">LINEマーケティングの8割をこれ1つでカバー</div>
+                  <div class="plan-catch">トリミングサロンのLINE集客をこれ1つでカバー</div>
                   <div class="plan-price-row">
                     <span class="plan-price">200,000</span>
                     <span class="plan-unit">円 買い切り</span>
@@ -662,7 +669,7 @@
                   <ul class="plan-features">
                     <li>LINE予約・Googleカレンダー連携</li>
                     <li>リマインド自動送信</li>
-                    <li>クーポン・呼び戻し配信</li>
+                    <li>犬種・サイズ別の自動配信</li>
                   </ul>
                 </div>
                 <div class="price-card pro">
